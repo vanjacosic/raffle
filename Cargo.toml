@@ -1,0 +1,11 @@
+[package]
+name = "raffle"
+version = "0.2.0"
+authors = ["Vanja Cosic <1070957+vanjacosic@users.noreply.github.com>"]
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+crossterm = "0.26.1"
+rand = "0.8.5"
+ratatui = "0.21.0"
