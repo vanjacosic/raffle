@@ -1,3 +1,4 @@
+use crate::{app::App, styles};
 use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
@@ -6,8 +7,6 @@ use ratatui::{
     widgets::{Block, BorderType, Borders, Clear, List, ListItem, Padding, Paragraph, Tabs, Wrap},
     Frame,
 };
-
-use crate::app::App;
 
 /// Renders the user interface widgets.
 pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
@@ -23,32 +22,14 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
         .tabs
         .titles
         .iter()
-        .map(|t| {
-            Line::from(Span::styled(
-                t,
-                Style::default()
-                    .fg(Color::White)
-                    .add_modifier(Modifier::UNDERLINED),
-            ))
-        })
+        .map(|title| Line::from(Span::raw(styles::pad_text(title))))
         .collect();
 
     let tabs = Tabs::new(titles)
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title("Menu")
-                .border_type(BorderType::Rounded),
-        )
+        .block(Block::default())
         .select(app.tabs.active)
-        .style(Style::default().fg(Color::LightBlue))
-        .highlight_style(
-            Style::default()
-                .remove_modifier(Modifier::UNDERLINED)
-                .add_modifier(Modifier::BOLD)
-                .fg(Color::LightRed)
-                .bg(Color::Black),
-        );
+        .style(styles::action())
+        .highlight_style(styles::active());
 
     frame.render_widget(tabs, chunks[0]);
 
@@ -77,15 +58,21 @@ pub fn render_tab_1<B: Backend>(_app: &mut App, frame: &mut Frame<'_, B>, area: 
         )),
         Line::from(""),
         Line::from(""),
-        Line::from(Span::raw("Made")),
-        Line::from(Span::raw("for the")),
-        Line::from(Span::raw("Copenhagen Rust Community 🦀🧡")),
+        Line::from("Made for the"),
+        Line::from(Span::styled(
+            "Copenhagen Rust Community 🦀🧡",
+            Style::default().fg(Color::LightRed),
+        )),
         Line::from(""),
         Line::from(""),
         Line::from(""),
-        Line::from(vec![Span::raw(
-            "Press `Esc`, `Ctrl-C` or `q` to stop running.",
-        )]),
+        Line::from(vec![
+            Span::raw("Press "),
+            Span::styled("Ctrl-C", styles::key()),
+            Span::raw(" or "),
+            Span::styled("q", styles::key()),
+            Span::raw(" to exit."),
+        ]),
     ]);
 
     frame.render_widget(
@@ -102,9 +89,7 @@ pub fn render_tab_1<B: Backend>(_app: &mut App, frame: &mut Frame<'_, B>, area: 
                         top: 2,
                         bottom: 2,
                     }),
-            )
-            .style(Style::default().fg(Color::White).bg(Color::Black))
-            .alignment(Alignment::Center),
+            ),
         area,
     );
 }
@@ -119,7 +104,9 @@ pub fn render_tab_2<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
         .list
         .items
         .iter()
-        .map(|p| ListItem::new(Span::styled(p.name.clone(), Style::default())))
+        .map(|participant| {
+            ListItem::new(styles::pad_text(&participant.name)).style(styles::action())
+        })
         .collect();
 
     let item_list = List::new(items)
@@ -134,24 +121,15 @@ pub fn render_tab_2<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
                     bottom: 1,
                 }),
         )
-        .style(Style::default().fg(Color::White))
-        .highlight_style(
-            Style::default()
-                .fg(Color::LightRed)
-                .add_modifier(Modifier::BOLD),
-        )
-        .highlight_symbol("-> ");
+        .highlight_style(styles::active());
 
     frame.render_stateful_widget(item_list, chunks[0], &mut app.list.state);
 
     let mut text = Text::from(vec![
         Line::from(""),
         Line::from(vec![
-            Span::styled(
-                format!("{} ", app.list.items.len()),
-                Style::default().fg(Color::Cyan),
-            ),
-            Span::raw("participants"),
+            Span::styled(app.list.items.len().to_string(), styles::variable()),
+            Span::raw(" participants"),
         ]),
     ]);
 
@@ -160,16 +138,28 @@ pub fn render_tab_2<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
             Line::from(""),
             Line::from(vec![
                 Span::raw("Selected participant: "),
-                Span::styled(app.get_highlighted_name(), Style::default().fg(Color::Cyan)),
+                Span::styled(app.get_highlighted_name(), styles::variable()),
             ]),
         ]);
     }
 
     text.extend(vec![
         Line::from(""),
-        Line::from(Span::raw("Use ⬆ / ⬇ to select.")),
         Line::from(""),
-        Line::from(Span::raw("Use BACKSPACE to remove.")),
+        Line::from(""),
+        Line::from(vec![
+            Span::raw("Use "),
+            Span::styled("⬇", styles::key()),
+            Span::raw(" / "),
+            Span::styled("⬆", styles::key()),
+            Span::raw(" to select."),
+        ]),
+        Line::from(""),
+        Line::from(vec![
+            Span::raw("Use "),
+            Span::styled("Backspace", styles::key()),
+            Span::raw(" to remove."),
+        ]),
     ]);
 
     frame.render_widget(
@@ -182,37 +172,38 @@ pub fn render_tab_2<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
                     .title_alignment(Alignment::Center)
                     .borders(Borders::ALL)
                     .border_type(BorderType::Rounded),
-            )
-            .style(Style::default().fg(Color::White).bg(Color::Black))
-            .alignment(Alignment::Center),
+            ),
         chunks[1],
     );
 }
 
 pub fn render_tab_3<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: Rect) {
     if app.spin_winner.is_some() {
-        let mut modal_text = Text::from("");
+        let modal_text = Text::from(vec![
+            Line::from(app.spin_winner.clone().unwrap().name),
+            Line::from(""),
+            Line::from("🎉🎉🎉"),
+        ]);
 
-        modal_text.extend(vec![Line::from(Span::styled(
-            format!("{} 🎉", app.spin_winner.clone().unwrap().name),
-            Style::default().fg(Color::Green),
-        ))]);
+        let modal = Paragraph::new(modal_text)
+            .alignment(Alignment::Center)
+            .block(
+                Block::default()
+                    .borders(Borders::ALL)
+                    .title("The winner is")
+                    .title_alignment(Alignment::Center)
+                    .style(Style::default().fg(Color::Green))
+                    .padding(Padding {
+                        left: 2,
+                        right: 2,
+                        top: 1,
+                        bottom: 1,
+                    }),
+            );
 
-        let block = Paragraph::new(modal_text).block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title("The winner is")
-                .padding(Padding {
-                    left: 2,
-                    right: 2,
-                    top: 0,
-                    bottom: 0,
-                }),
-        );
-
-        let area2 = centered_rect(20, 15, area);
-        frame.render_widget(Clear, area2); //this clears out the background
-        frame.render_widget(block, area2);
+        let inner_area = centered_rect(25, 20, area);
+        frame.render_widget(Clear, inner_area);
+        frame.render_widget(modal, inner_area);
     } else {
         let mut text = Text::from("");
 
@@ -226,16 +217,16 @@ pub fn render_tab_3<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
                 Line::from(""),
                 Line::from(Span::raw(format!("🎲 {}", app.spin_counter))),
                 Line::from(""),
-                Line::from(""),
-                Line::from(Span::styled(
-                    app.get_random().name,
-                    Style::default().fg(Color::Cyan),
-                )),
+                Line::from("Will it be"),
+                Line::from(Span::styled(app.get_random().name, styles::variable())),
+                Line::from("?"),
             ]);
         } else {
             text.extend(vec![
                 Line::from(""),
-                Line::from(Span::raw("Ready to roll!")),
+                Line::from(Span::raw("Ready to roll.")),
+                Line::from(""),
+                Line::from(Span::raw("Press `s` to start the spin.")),
             ]);
         }
 
@@ -249,6 +240,7 @@ pub fn render_tab_3<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
     }
 }
 
+// Modal window
 fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)

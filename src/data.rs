@@ -4,8 +4,6 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-use ratatui::widgets::ListState;
-
 #[derive(Debug, Clone)]
 pub struct Participant {
     pub name: String,
@@ -16,7 +14,7 @@ pub fn read_participants_from_file() -> Result<Vec<Participant>, Box<dyn Error>>
     let file = File::open("participants.txt")?;
     let lines = BufReader::new(file).lines();
 
-    let results: Vec<Participant> = lines
+    let participants: Vec<Participant> = lines
         .into_iter()
         .map(|p| -> Participant {
             Participant {
@@ -26,78 +24,28 @@ pub fn read_participants_from_file() -> Result<Vec<Participant>, Box<dyn Error>>
         })
         .collect();
 
-    Ok(results)
+    Ok(participants)
 }
 
-#[derive(Debug)]
-pub struct StatefulList<T> {
-    pub state: ListState,
-    pub items: Vec<T>,
-}
+//pub fn get_participants() -> Result<Vec<Participant>, Box<dyn error::Error>> {
+//     let participant_list: Vec<Participant> = vec![
+//         Participant {
+//             name: String::from("Alice"),
+//             winner: false,
+//         },
+//         Participant {
+//             name: String::from("Bob"),
+//             winner: false,
+//         },
+//         Participant {
+//             name: String::from("Mallory"),
+//             winner: false,
+//         },
+//         Participant {
+//             name: String::from("Ken"),
+//             winner: false,
+//         },
+//     ];
 
-impl<T: std::clone::Clone> StatefulList<T> {
-    pub fn new(items: Vec<T>) -> StatefulList<T> {
-        StatefulList {
-            state: ListState::default(),
-            items,
-        }
-    }
-
-    pub fn next(&mut self) {
-        if self.items.is_empty() {
-            return;
-        }
-
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i >= self.items.len() - 1 {
-                    0
-                } else {
-                    i + 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i));
-    }
-
-    pub fn previous(&mut self) {
-        if self.items.is_empty() {
-            return;
-        }
-
-        let i = match self.state.selected() {
-            Some(i) => {
-                if i == 0 {
-                    self.items.len() - 1
-                } else {
-                    i - 1
-                }
-            }
-            None => 0,
-        };
-        self.state.select(Some(i));
-    }
-
-    pub fn unselect(&mut self) {
-        self.state.select(None);
-    }
-
-    pub fn get_selected(&mut self) -> Option<T> {
-        match self.state.selected() {
-            Some(index) => Some(self.items[index].clone()),
-            _ => None,
-        }
-    }
-
-    pub fn remove(&mut self) {
-        if self.items.is_empty() {
-            return;
-        }
-
-        let Some(i) = self.state.selected() else { return };
-
-        self.items.remove(i);
-        self.state.select(None);
-    }
-}
+//     Ok(participant_list)
+// }

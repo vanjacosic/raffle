@@ -1,6 +1,8 @@
-use crate::data::{self, Participant, StatefulList};
 use rand::Rng;
+use ratatui::widgets::ListState;
 use std::{error, vec};
+
+use crate::data::{self, Participant};
 
 /// Application result type.
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
@@ -11,21 +13,18 @@ pub struct App {
     /// Is the application running?
     pub running: bool,
 
+    // state
+    pub list: StatefulList<Participant>,
+
+    // tabs
+    pub tabs: StatefulTabs,
+
     // spin
     pub spinning: bool,
 
     pub spin_counter: usize,
 
     pub spin_winner: Option<Participant>,
-
-    // state
-    pub list: StatefulList<Participant>,
-
-    // modal
-    pub show_modal: bool,
-
-    // tabs
-    pub tabs: StatefulTabs,
 }
 
 impl Default for App {
@@ -47,7 +46,6 @@ impl Default for App {
             spin_winner: None,
             tabs: StatefulTabs::new(tab_titles),
             list: StatefulList::new(participants),
-            show_modal: false,
         }
     }
 }
@@ -83,7 +81,7 @@ impl App {
         } else {
             let winner = self.list.items[random_index].clone();
             self.spin_winner = Some(winner.clone());
-            self.spin_counter = 200;
+            self.spin_counter = 50;
             self.spinning = false;
             winner
         }
@@ -118,5 +116,78 @@ impl StatefulTabs {
         } else {
             self.active = self.titles.len() - 1;
         }
+    }
+}
+
+#[derive(Debug)]
+pub struct StatefulList<T> {
+    pub state: ListState,
+    pub items: Vec<T>,
+}
+
+impl<T: std::clone::Clone> StatefulList<T> {
+    pub fn new(items: Vec<T>) -> StatefulList<T> {
+        StatefulList {
+            state: ListState::default(),
+            items,
+        }
+    }
+
+    pub fn next(&mut self) {
+        if self.items.is_empty() {
+            return;
+        }
+
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i >= self.items.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    pub fn previous(&mut self) {
+        if self.items.is_empty() {
+            return;
+        }
+
+        let i = match self.state.selected() {
+            Some(i) => {
+                if i == 0 {
+                    self.items.len() - 1
+                } else {
+                    i - 1
+                }
+            }
+            None => 0,
+        };
+        self.state.select(Some(i));
+    }
+
+    pub fn unselect(&mut self) {
+        self.state.select(None);
+    }
+
+    pub fn get_selected(&mut self) -> Option<T> {
+        match self.state.selected() {
+            Some(index) => Some(self.items[index].clone()),
+            _ => None,
+        }
+    }
+
+    pub fn remove(&mut self) {
+        if self.items.is_empty() {
+            return;
+        }
+
+        let Some(i) = self.state.selected() else { return };
+
+        self.items.remove(i);
+        self.state.select(None);
     }
 }
