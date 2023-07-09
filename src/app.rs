@@ -7,6 +7,8 @@ use crate::data::{self, Participant};
 /// Application result type.
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
+const SPIN_ROUNDS: usize = 50;
+
 /// Application.
 #[derive(Debug)]
 pub struct App {
@@ -42,7 +44,7 @@ impl Default for App {
         Self {
             running: true,
             spinning: false,
-            spin_counter: 50,
+            spin_counter: SPIN_ROUNDS,
             spin_winner: None,
             tabs: StatefulTabs::new(tab_titles),
             list: StatefulList::new(participants),
@@ -66,7 +68,7 @@ impl App {
 
     pub fn start(&mut self) {
         self.spin_winner = None;
-        self.spin_counter = 50;
+        self.spin_counter = SPIN_ROUNDS;
         self.spinning = true;
     }
 
@@ -79,11 +81,15 @@ impl App {
             self.spin_counter -= 1;
             self.list.items[random_index].clone()
         } else {
-            let winner = self.list.items[random_index].clone();
+            let winner = &mut self.list.items[random_index];
+
+            winner.is_winner = true;
+
             self.spin_winner = Some(winner.clone());
-            self.spin_counter = 50;
+            self.spin_counter = SPIN_ROUNDS;
             self.spinning = false;
-            winner
+
+            winner.clone()
         }
     }
 

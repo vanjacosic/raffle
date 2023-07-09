@@ -105,7 +105,13 @@ pub fn render_tab_2<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
         .items
         .iter()
         .map(|participant| {
-            ListItem::new(styles::pad_text(&participant.name)).style(styles::action())
+            let item = ListItem::new(participant.to_string());
+
+            if participant.is_winner {
+                item.style(styles::winner())
+            } else {
+                item.style(styles::action())
+            }
         })
         .collect();
 
@@ -178,9 +184,9 @@ pub fn render_tab_2<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: R
 }
 
 pub fn render_tab_3<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: Rect) {
-    if app.spin_winner.is_some() {
+    if let Some(winner) = &app.spin_winner {
         let modal_text = Text::from(vec![
-            Line::from(app.spin_winner.clone().unwrap().name),
+            Line::from(winner.clone().to_string()),
             Line::from(""),
             Line::from("🎉🎉🎉"),
         ]);

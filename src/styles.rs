@@ -8,6 +8,10 @@ pub fn action() -> Style {
     Style::default().fg(Color::Cyan)
 }
 
+pub fn winner() -> Style {
+    action().fg(Color::Green).add_modifier(Modifier::DIM)
+}
+
 pub fn key() -> Style {
     action().add_modifier(Modifier::UNDERLINED)
 }

@@ -1,5 +1,6 @@
 use std::{
     error::Error,
+    fmt,
     fs::File,
     io::{BufRead, BufReader},
 };
@@ -7,7 +8,17 @@ use std::{
 #[derive(Debug, Clone)]
 pub struct Participant {
     pub name: String,
-    pub winner: bool,
+    pub is_winner: bool,
+}
+
+impl fmt::Display for Participant {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.is_winner {
+            write!(f, "🎁 {}", self.name)
+        } else {
+            write!(f, "{}", self.name)
+        }
+    }
 }
 
 pub fn read_participants_from_file() -> Result<Vec<Participant>, Box<dyn Error>> {
@@ -19,7 +30,7 @@ pub fn read_participants_from_file() -> Result<Vec<Participant>, Box<dyn Error>>
         .map(|p| -> Participant {
             Participant {
                 name: p.unwrap(),
-                winner: false,
+                is_winner: false,
             }
         })
         .collect();
