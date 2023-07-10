@@ -16,27 +16,29 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
             }
         }
 
-        // Spin
-        KeyCode::Char('s') => app.start(),
-
         // Tabs
         KeyCode::Tab => app.tabs.next_tab(),
 
+        // Spin
+        KeyCode::Char('s') => app.start_spin(),
+
+        KeyCode::Char('r') => app.stop_spin(),
+
         // List handlers
         KeyCode::Up => {
-            app.list.previous();
+            app.all_participants.previous();
         }
 
         KeyCode::Down => {
-            app.list.next();
+            app.all_participants.next();
         }
 
-        KeyCode::Left => {
-            app.list.unselect();
+        KeyCode::Esc => {
+            app.all_participants.unselect();
         }
 
         KeyCode::Backspace => {
-            app.list.remove();
+            app.all_participants.remove();
         }
 
         _ => {}

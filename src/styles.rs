@@ -1,28 +1,49 @@
-use ratatui::style::{Color, Modifier, Style};
+use ratatui::{
+    style::{Color, Modifier, Style},
+    widgets::Padding,
+};
 
-pub fn variable() -> Style {
-    Style::default().fg(Color::Yellow)
-}
+pub const PADDING: Padding = Padding {
+    left: 2,
+    right: 2,
+    top: 1,
+    bottom: 1,
+};
 
 pub fn action() -> Style {
-    Style::default().fg(Color::Cyan)
+    Style::default().fg(Color::LightCyan)
+}
+
+pub fn action_highlight() -> Style {
+    action()
+        .add_modifier(Modifier::BOLD)
+        .add_modifier(Modifier::REVERSED)
 }
 
 pub fn winner() -> Style {
-    action().fg(Color::Green).add_modifier(Modifier::DIM)
+    action().fg(Color::LightGreen)
+}
+
+pub fn winner_highlight() -> Style {
+    winner()
+        .add_modifier(Modifier::BOLD)
+        .add_modifier(Modifier::REVERSED)
 }
 
 pub fn key() -> Style {
     action().add_modifier(Modifier::UNDERLINED)
 }
 
-pub fn active() -> Style {
-    Style::default()
-        .fg(Color::Cyan)
+pub fn spin() -> Style {
+    Style::default().fg(Color::LightYellow)
+}
+
+pub fn spin_highlight() -> Style {
+    spin()
         .add_modifier(Modifier::BOLD)
         .add_modifier(Modifier::REVERSED)
 }
 
-pub fn pad_text(string: &str) -> String {
-    format!(" {} ", string)
+pub fn orange() -> Style {
+    Style::default().fg(Color::Indexed(214))
 }

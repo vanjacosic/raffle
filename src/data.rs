@@ -5,7 +5,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Participant {
     pub name: String,
     pub is_winner: bool,
@@ -37,26 +37,3 @@ pub fn read_participants_from_file() -> Result<Vec<Participant>, Box<dyn Error>>
 
     Ok(participants)
 }
-
-//pub fn get_participants() -> Result<Vec<Participant>, Box<dyn error::Error>> {
-//     let participant_list: Vec<Participant> = vec![
-//         Participant {
-//             name: String::from("Alice"),
-//             winner: false,
-//         },
-//         Participant {
-//             name: String::from("Bob"),
-//             winner: false,
-//         },
-//         Participant {
-//             name: String::from("Mallory"),
-//             winner: false,
-//         },
-//         Participant {
-//             name: String::from("Ken"),
-//             winner: false,
-//         },
-//     ];
-
-//     Ok(participant_list)
-// }

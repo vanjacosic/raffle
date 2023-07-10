@@ -15,39 +15,33 @@ pub struct App {
     /// Is the application running?
     pub running: bool,
 
-    // state
-    pub list: StatefulList<Participant>,
-
-    // tabs
+    // Tabs
     pub tabs: StatefulTabs,
 
-    // spin
-    pub spinning: bool,
+    // Lists
+    pub all_participants: StatefulList<Participant>,
+    pub all_winners: Vec<Participant>,
 
+    // Spinner
+    pub is_spinning: bool,
     pub spin_counter: usize,
-
     pub spin_winner: Option<Participant>,
 }
 
 impl Default for App {
     fn default() -> Self {
-        // println!("{}", std::env::current_dir().unwrap().display());
-
-        let tab_titles = vec![
-            "Home".to_string(),
-            "Participants".to_string(),
-            "Raffle".to_string(),
-        ];
+        let tab_titles = vec!["Home".to_string(), "Participants".to_string()];
 
         let participants = data::read_participants_from_file().expect("Failed to read file");
 
         Self {
             running: true,
-            spinning: false,
+            tabs: StatefulTabs::new(tab_titles),
+            all_participants: StatefulList::new(participants),
+            all_winners: Vec::new(),
+            is_spinning: false,
             spin_counter: SPIN_ROUNDS,
             spin_winner: None,
-            tabs: StatefulTabs::new(tab_titles),
-            list: StatefulList::new(participants),
         }
     }
 }
@@ -58,46 +52,56 @@ impl App {
         Self::default()
     }
 
-    /// Handles the tick event of the terminal
-    pub fn tick(&self) {}
-
     /// Set running to false to quit the application
     pub fn quit(&mut self) {
         self.running = false;
     }
 
-    pub fn start(&mut self) {
-        self.spin_winner = None;
-        self.spin_counter = SPIN_ROUNDS;
-        self.spinning = true;
+    /// Handles the tick event of the terminal
+    pub fn tick(&mut self) {
+        self.spin_round()
     }
 
-    pub fn get_random(&mut self) -> Participant {
+    pub fn start_spin(&mut self) {
+        if self.all_participants.items.is_empty() {
+            return;
+        }
+
+        self.is_spinning = true;
+        self.spin_counter = SPIN_ROUNDS;
+        self.spin_winner = None;
+    }
+
+    pub fn spin_round(&mut self) {
+        if !self.is_spinning {
+            return;
+        }
+
         let mut rng = rand::thread_rng();
 
-        let random_index = rng.gen_range(0..self.list.items.len());
+        let random_index = rng.gen_range(0..self.all_participants.items.len());
+
+        self.all_participants.state.select(Some(random_index));
 
         if self.spin_counter > 0 {
             self.spin_counter -= 1;
-            self.list.items[random_index].clone()
         } else {
-            let winner = &mut self.list.items[random_index];
+            let winner = &mut self.all_participants.items[random_index];
 
             winner.is_winner = true;
 
+            self.all_winners.push(winner.clone());
+
             self.spin_winner = Some(winner.clone());
             self.spin_counter = SPIN_ROUNDS;
-            self.spinning = false;
-
-            winner.clone()
+            self.is_spinning = false;
         }
     }
 
-    pub fn get_highlighted_name(&mut self) -> String {
-        match self.list.get_selected() {
-            Some(pers) => pers.name,
-            None => String::from("None"),
-        }
+    pub fn stop_spin(&mut self) {
+        self.is_spinning = false;
+        self.spin_counter = SPIN_ROUNDS;
+        self.spin_winner = None;
     }
 }
 
