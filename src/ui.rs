@@ -40,13 +40,11 @@ pub fn render<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
 }
 
 pub fn render_tab_1<B: Backend>(_app: &mut App, frame: &mut Frame<'_, B>, area: Rect) {
-    let text = Text::from(vec![
-        Line::from(Span::styled(
-            "R.A.F.F.L.E.",
-            Style::default()
-                .fg(Color::LightGreen)
-                .add_modifier(Modifier::BOLD),
-        )),
+    let mut text = Text::from(styles::LOGO);
+
+    text.patch_style(styles::winner());
+
+    text.extend(vec![
         Line::from(""),
         Line::from(Span::styled(
             "( Rapidly Assembled Faulty Fortune Locator Engine )",
