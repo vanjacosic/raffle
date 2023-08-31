@@ -19,10 +19,10 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         // Tabs
         KeyCode::Tab => app.tabs.next_tab(),
 
-        // Spin
+        // Spin actions
         KeyCode::Char('s') => app.start_spin(),
 
-        KeyCode::Char('r') => app.stop_spin(),
+        KeyCode::Char('r') => app.reset_spin(),
 
         // List handlers
         KeyCode::Up => {

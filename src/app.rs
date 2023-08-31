@@ -73,9 +73,9 @@ impl App {
         let mut rng = rand::thread_rng();
         let random_spins = rng.gen_range(min_spins..max_spins);
 
-        self.is_spinning = true;
         self.spin_counter = random_spins;
         self.spin_winner = None;
+        self.is_spinning = true;
     }
 
     pub fn spin_round(&mut self) {
@@ -95,13 +95,16 @@ impl App {
             self.spin_winner = Some(winner.clone());
             self.all_winners.push(winner.clone());
 
-            self.is_spinning = false;
-            self.spin_counter = 0;
+            self.stop_spin();
         }
     }
 
     pub fn stop_spin(&mut self) {
         self.is_spinning = false;
+    }
+
+    pub fn reset_spin(&mut self) {
+        self.stop_spin();
         self.spin_counter = 0;
         self.spin_winner = None;
     }
