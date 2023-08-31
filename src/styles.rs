@@ -71,3 +71,9 @@ pub fn spin_highlight() -> Style {
 pub fn orange() -> Style {
     Style::default().fg(Color::Indexed(214))
 }
+
+pub fn secondary() -> Style {
+    Style::default()
+        .fg(Color::Gray)
+        .add_modifier(Modifier::ITALIC)
+}

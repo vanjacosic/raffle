@@ -2,7 +2,6 @@ use crate::{app::App, styles};
 use ratatui::{
     backend::Backend,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style},
     text::{Line, Span, Text},
     widgets::{Block, BorderType, Borders, Clear, List, ListItem, Padding, Paragraph, Tabs, Wrap},
     Frame,
@@ -47,10 +46,8 @@ pub fn render_tab_1<B: Backend>(_app: &mut App, frame: &mut Frame<'_, B>, area: 
     text.extend(vec![
         Line::from(""),
         Line::from(Span::styled(
-            "( Rapidly Assembled Faulty Fortune Locator Engine )",
-            Style::default()
-                .fg(Color::Gray)
-                .add_modifier(Modifier::ITALIC),
+            "( Rapidly Assembled Ferris Fortune Locator Engine )",
+            styles::secondary(),
         )),
         Line::from(""),
         Line::from(""),
