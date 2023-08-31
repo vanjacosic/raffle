@@ -7,8 +7,6 @@ use crate::data::{self, Participant};
 /// Application result type.
 pub type AppResult<T> = std::result::Result<T, Box<dyn error::Error>>;
 
-const SPIN_ROUNDS: usize = 50;
-
 /// Application.
 #[derive(Debug)]
 pub struct App {
@@ -40,7 +38,7 @@ impl Default for App {
             all_participants: StatefulList::new(participants),
             all_winners: Vec::new(),
             is_spinning: false,
-            spin_counter: SPIN_ROUNDS,
+            spin_counter: 0,
             spin_winner: None,
         }
     }
@@ -67,8 +65,16 @@ impl App {
             return;
         }
 
+        let participant_count = self.all_participants.items.len();
+
+        let min_spins = participant_count * 3;
+        let max_spins = participant_count * 6;
+
+        let mut rng = rand::thread_rng();
+        let random_spins = rng.gen_range(min_spins..max_spins);
+
         self.is_spinning = true;
-        self.spin_counter = SPIN_ROUNDS;
+        self.spin_counter = random_spins;
         self.spin_winner = None;
     }
 
@@ -77,30 +83,26 @@ impl App {
             return;
         }
 
-        let mut rng = rand::thread_rng();
-
-        let random_index = rng.gen_range(0..self.all_participants.items.len());
-
-        self.all_participants.state.select(Some(random_index));
-
         if self.spin_counter > 0 {
+            self.all_participants.next();
             self.spin_counter -= 1;
-        } else {
-            let winner = &mut self.all_participants.items[random_index];
+            return;
+        }
 
+        if let Some(winner) = &mut self.all_participants.get_selected() {
             winner.is_winner = true;
 
+            self.spin_winner = Some(winner.clone());
             self.all_winners.push(winner.clone());
 
-            self.spin_winner = Some(winner.clone());
-            self.spin_counter = SPIN_ROUNDS;
             self.is_spinning = false;
+            self.spin_counter = 0;
         }
     }
 
     pub fn stop_spin(&mut self) {
         self.is_spinning = false;
-        self.spin_counter = SPIN_ROUNDS;
+        self.spin_counter = 0;
         self.spin_winner = None;
     }
 }
