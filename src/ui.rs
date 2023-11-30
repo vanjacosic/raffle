@@ -186,12 +186,11 @@ pub fn render_spin<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: Re
                     .title_alignment(Alignment::Center)
                     .borders(Borders::ALL)
                     .border_type(BorderType::Thick)
-                    .style(styles::winner())
-                    .padding(styles::PADDING),
+                    .style(styles::winner()),
             );
     }
 
-    let modal = create_modal(40, 30, area);
+    let modal = create_modal(40, 50, area);
     frame.render_widget(Clear, modal);
     frame.render_widget(modal_content, modal);
 }
