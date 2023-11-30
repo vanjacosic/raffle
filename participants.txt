@@ -2,6 +2,12 @@ Alice
 Bob
 Mallory
 DJB
-Feistel
 Diffie
 Hellman
+Schneier
+Rijmen
+Rivest
+Shamir
+Adleman
+Feistel
+Caesar

@@ -22,7 +22,8 @@ impl fmt::Display for Participant {
 }
 
 pub fn read_participants_from_file() -> Result<Vec<Participant>, Box<dyn Error>> {
-    let file = File::open("participants.txt")?;
+    let file = File::open("participants.txt").expect("Could not read file: participants.txt");
+
     let lines = BufReader::new(file).lines();
 
     let participants: Vec<Participant> = lines
