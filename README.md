@@ -1,12 +1,18 @@
-# raffle
+# R.A.F.F.L.E.
 
-R.A.F.F.L.E. aka. Rapidly Assembled Ferris Fortune Locator Engine.
+aka. *Rapidly Assembled Ferris Fortune Locator Engine*.
 
-A TUI application that picks a winner from a list of meetup participants.
+A TUI application that picks a winner from a list of meetup participants. Built with the wonderful [`Ratatui`](https://github.com/ratatui-org/ratatui).
+
+![Screenshot of the TUI](demo.png)
+
+## Why?
+
+At the end of each [Copenhagen Rust Community](https://cph.rs) [meetup](https://www.meetup.com/copenhagen-rust-community/), we give away books to participants, so I made a small tool to make that the process a bit more fun.
 
 ## Structure
 
-Generated from: [rust-tui-templates](https://github.com/tui-rs-revival/rust-tui-template)
+This project was generated from [rust-tui-templates](https://github.com/tui-rs-revival/rust-tui-template) (in June 2023).
 
 ```text
 src/
@@ -19,10 +25,16 @@ src/
 └── ui.rs      -> renders the widgets / UI
 ```
 
-### Sources
+---
 
-- https://github.com/zupzup/rust-commandline-example/blob/main/src/main.rs
-
-- https://github.com/nonzac/tui_view/blob/master/src/lib.rs
-
-- https://github.com/GlebIrovich/rudo/blob/master/src/app_layout.rs
+```text
+_____________________________
+/         Made for the        \
+\  Copenhagen Rust Community  /
+ +---------------------------+
+      \
+       \    _~^~^~_    |🇩🇰
+        \) /  o o  \ (/|
+          '_   -   _'
+          / '-----' \
+```
