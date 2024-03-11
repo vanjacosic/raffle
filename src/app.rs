@@ -1,6 +1,6 @@
 use rand::Rng;
 use ratatui::widgets::ListState;
-use std::{error, vec};
+use std::{error, path::Path, vec};
 
 use crate::data::{self, Participant};
 
@@ -28,9 +28,16 @@ pub struct App {
 
 impl Default for App {
     fn default() -> Self {
+        Self::new(Path::new("participants.txt"))
+    }
+}
+
+impl App {
+    /// Constructs a new instance of [`App`].
+    pub fn new(path: &Path) -> Self {
         let tab_titles = vec!["Home".to_string(), "Participants".to_string()];
 
-        let participants = data::read_participants_from_file().expect("Failed to read file");
+        let participants = data::read_participants_from_file(path).expect("Failed to read file");
 
         Self {
             running: true,
@@ -41,13 +48,6 @@ impl Default for App {
             spin_counter: 0,
             spin_winner: None,
         }
-    }
-}
-
-impl App {
-    /// Constructs a new instance of [`App`].
-    pub fn new() -> Self {
-        Self::default()
     }
 
     /// Set running to false to quit the application
