@@ -1,3 +1,4 @@
+use clap::Parser;
 use raffle::app::{App, AppResult};
 use raffle::event::{Event, EventHandler};
 use raffle::handler::handle_key_events;
@@ -6,12 +7,24 @@ use raffle::tui::Tui;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 use std::io;
+use std::path::{PathBuf};
 
 const TICK_RATE: u64 = 100;
 
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    participants_file: Option<PathBuf>,
+}
+
 fn main() -> AppResult<()> {
     // Create an application.
-    let mut app = App::new();
+    let args = Args::parse();
+    let mut app = match args.participants_file {
+        Some(path) => App::new(&path),
+        None => App::default(),
+    };
 
     // Initialize the terminal user interface.
     let backend = CrosstermBackend::new(io::stderr());

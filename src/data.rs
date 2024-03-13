@@ -3,6 +3,7 @@ use std::{
     fmt,
     fs::File,
     io::{BufRead, BufReader},
+    path::Path,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -21,8 +22,8 @@ impl fmt::Display for Participant {
     }
 }
 
-pub fn read_participants_from_file() -> Result<Vec<Participant>, Box<dyn Error>> {
-    let file = File::open("participants.txt").expect("Could not read file: participants.txt");
+pub fn read_participants_from_file(path: &Path) -> Result<Vec<Participant>, Box<dyn Error>> {
+    let file = File::open(path).expect("Could not read file: participants.txt");
 
     let lines = BufReader::new(file).lines();
 
