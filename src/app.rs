@@ -188,9 +188,9 @@ impl<T: std::clone::Clone> StatefulList<T> {
         self.state.select(None);
     }
 
-    pub fn get_selected(&mut self) -> Option<T> {
+    pub fn get_selected(&mut self) -> Option<&mut T> {
         match self.state.selected() {
-            Some(index) => Some(self.items[index].clone()),
+            Some(index) => Some(&mut self.items[index]),
             _ => None,
         }
     }

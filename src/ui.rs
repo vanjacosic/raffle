@@ -127,7 +127,19 @@ pub fn render_list<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>, area: Re
                 }),
         )
         .highlight_style({
-            let winner_higlighted = { app.all_participants.get_selected() == app.spin_winner };
+            let winner_higlighted = {
+                match app.all_participants.get_selected() {
+                    Some(selected) => {
+                        if let Some(spin_winner) = &app.spin_winner {
+                            spin_winner.clone_into(selected);
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                    None => false,
+                }
+            };
 
             if winner_higlighted {
                 styles::winner_highlight()
